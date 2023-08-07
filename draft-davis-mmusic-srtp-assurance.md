@@ -1,10 +1,10 @@
 ---
-title: "SDP Security Assurance for Secure Real-time Transport Protocol (SRTP)"
+title: "Signaling Additional SRTP Context information via SDP"
 abbrev: "SRTP Assurance"
 category: std
 updates: '4568'
 
-docname: draft-davis-mmusic-srtp-assurance-00
+docname: draft-davis-mmusic-srtp-assurance-01
 submissiontype: IETF
 date: 2023
 consensus: true
@@ -63,6 +63,25 @@ The mechanism also enhances SRTP operation in cases where there is a risk of los
 
 # Introduction
 
+## Discussion Venues {#discussion}
+{:removeinrfc}
+
+Source for this draft and an issue tracker can be found at https://github.com/kyzer-davis/srtp-assurance-rfc-draft.
+
+## Changelog {#changelog}
+{:removeinrfc}
+
+draft-01
+
+{: spacing="compact"}
+
+- Change contact name from IESG to IETF in IANA Considerations #2
+- Discuss RFC4568 "Late Joiner" in problem statement: #3
+- Split Serial forking scenario into its own section #4
+- Add MIKEY considerations to Protocol Design section #6
+- Change doc title #7
+- Add SEQ abbreviation earlier #8
+
 ## Problem Statement {#Problem}
 
 While {{RFC4568}} provides most of the information required to instantiate an SRTP cryptographic context for RTP Packets, 
@@ -70,7 +89,7 @@ the state of a few crucial items in the SRTP cryptographic context are missing.
 One such item is the Rollover Counter (ROC) defined by Section 3.2.1 {{RFC3711}}
 which is not signaled in any packet across the wire and shared between applications.
 
-The ROC is one item that is used to create the SRTP Packet Index along with the the {{RFC3550}} transmitted sequence numbers for a given synchronization sources (SSRC).
+The ROC is one item that is used to create the SRTP Packet Index along with the the {{RFC3550}} transmitted sequence numbers (SEQ) for a given synchronization sources (SSRC).
 The Packet index is integral to the encryption, decryption and authentication process of SRTP key streams.
 Failure to synchronize the value properly at any point in the SRTP media exchange leads to encryption or decryption failures, degraded user experience 
 and at cross-vendor interoperability issues with many hours of engineering time spent debugging a value that is never negotiated on the wire 
@@ -79,6 +98,7 @@ and at cross-vendor interoperability issues with many hours of engineering time 
 The current method of ROC handling is to instantiate a new media stream's cryptographic context at 0 as per Section 3.3.1 of {{RFC3711}}. 
 Then track the state ROC for a given cryptographic context as the time continues on and the stream progresses. 
 
+{{RFC4568}}, states 'there is no concept of a "late joiner" in SRTP security descriptions' as the main reason for not conveying the ROC, SSRC, or SEQ via the key management protocol but as one will see below; this argument is not true in practice.
 
 When joining ongoing streams, resuming held/transferred streams, or devices without embedded application logic for clustering/high availability where a given cryptographic context is resumed; 
 without any explicit signaling about the ROC state, devices must make an educated guess as defined by Section 3.3.1 of {{RFC3711}}.
@@ -108,8 +128,13 @@ Hold/Resume, Transfer Scenarios:
 - The sender may re-assume the original cryptographic context rather rather than create one net new. 
 - Here if the sender starts the stream from the last observed sequence number the receiver observed the ROC will be in sync.
 - However there are scenarios where the sender may have been transmitting packets on the previous cryptographic context and if a ROC increment occurred; the receiver would never know. This can lead to problems when the streams are reconnected as the ROC is now out of sync between both parties.
-- A similar scenario was brought up in Appendix A of {{RFC4568}} "Scenario B" and "Problem 3" of the summary within this section.
 - Further, a sender may be transferred to some upstream device transparently to them. If the sender does not reset their cryptographic context that new receiver will now be out of sync with possible ROC values.
+
+Serial Forking Case:
+
+{: spacing="compact"}
+- {{RFC4568}} itself cites a problematic scenario in their own Appendix A, Scenario B, Problem 3 where a ROC out of sync scenario could occur.
+- The proposed solution for problem 3 involves a method to convey the ROC however known the problem; the authors still did not include this in the base SDP Security specification.
 
 Application Failover (without stateful syncs):
 
@@ -185,6 +210,9 @@ Key Management Extensions for Session Description Protocol (SDP) and Real Time S
 ZRTP: Media Path Key Agreement for Unicast Secure RTP:
 : This specifications makes no attempt to be compatible with the Key Management via SDP for ZRTP "a=zrtp-hash" defined by {{RFC6189}}. 
 
+MIKEY:
+: This specifications makes no attempt to be compatible with the SRTP Key Management via MIKEY {{RFC3830}}. 
+
 DTLS-SRTP, EKT-SRTP, Privacy Enhanced Conferencing items (PERC):
 : All DTLS-SRTP items including Privacy Enhanced Conferencing items (PERC) [ {{RFC8723}} and {{RFC8871}} ] are out of scope for the purposes of this specification.
 
@@ -228,7 +256,7 @@ Note that long lines in this document have been broken into multiple lines using
 The formal definition of the SRTP Context Attribute, including custom extension field=value pairs is provided by the following ABNF {{RFC5234}}:
 
 ~~~~ abnf
-srtp-assurance = srtp-attr
+srtp-context   = srtp-attr
                  srtp-tag
                  [srtp-ssrc";"]
                  [srtp-roc";"]
@@ -329,7 +357,7 @@ See {{frequency}} for update frequency recommendations.
 ## Receiver Behavior {#receiver}
 Receivers SHOULD utilize the signaled information in application logic to instantiate the SRTP cryptographic context.
 In the even there is no SRTP Context attributes present in SDP receivers MUST fallback to {{RFC3711}} for guesting 
-the ROC and {{RFC4568}} logic for late binding to gleam the SSRC and sequence numbers.
+the ROC and {{RFC4568}} logic for late binding to gleam the SSRC and sequence numbers (SEQ).
 
 ## Update Frequency {#frequency}
 Senders SHOULD provide SRTP Context SDP when SDP Crypto attributes are negotiated.
@@ -366,7 +394,7 @@ This document updates the "attribute-name (formerly "att-field")" sub-registry o
 Specifically, it adds the SDP "a=srtpctx" attribute for use at the media level.
 
 | Form                  | Value |
-| Contact name          | IESG |
+| Contact name          | IETF |
 | Contact email address | kydavis@cisco.com |
 | Attribute name        | srtpctx |
 | Attribute value       | srtpctx |
@@ -380,6 +408,6 @@ Specifically, it adds the SDP "a=srtpctx" attribute for use at the media level.
 {: #ianaForm title='IANA SDP Registration Form'}
 
 # Acknowledgements
-Thanks to Paul Jones for reviewing early draft material and providing valueable feedback.
+Thanks to Paul Jones for reviewing early draft material and providing valuable feedback.
 
 --- back
