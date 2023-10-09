@@ -400,7 +400,7 @@ Rather than modify a=crypto SDP security or create a new unique SDP attribute, o
 
 ~~~~
 a=crypto:1 FOO_CHACHA20_POLY1305_SHA256 \
-  inline:1ef9a49f1f68f75f95feca6898921db8c73bfa53e71e33726c4c983069dd7d44
+ inline:1ef9a49f1f68f75f95feca6898921db8c73bfa53e71e33726c4c983069dd7d44
 a=srtpctx:1 foo=1;bar=abc123;nonce=8675309
 ~~~~
 
