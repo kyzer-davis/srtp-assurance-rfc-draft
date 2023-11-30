@@ -318,7 +318,7 @@ param-key       = 1*(ALPHA / DIGIT / "_" / "-")
                   ; Alphanumeric key name
                   ; May include underscore or hyphen
 
-param-value     = 1*ALPHA
+param-value     = 1*BYTESTRING
                   ; Byte String key value
 
 ALPHA           = %x41-5A / %x61-7A 
