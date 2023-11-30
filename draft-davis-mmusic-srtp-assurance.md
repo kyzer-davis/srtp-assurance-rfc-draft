@@ -76,6 +76,7 @@ draft-02
 {: spacing="compact"}
 
 - Better define that the tags must match #16
+- Revise ANBF #15
 
 draft-01
 
@@ -257,48 +258,110 @@ This specification introduces a new SRTP Context attribute defined as "a=srtpctx
 The presence of the "a=srtpctx" attribute in the SDP (in either an offer or an answer) indicates that the endpoint is 
 signaling explicit cryptographic context information and this data SHOULD be used in place of derived values such as those obtained from late binding or some other mechanism.
 
-The SRTP Context value syntax utilizes standard attribute field=value pairs separated by semi-colons as seen in {{sampleBase}}.
-The implementation's goal is extendable allowing for additional vendor specific field=value pairs alongside the ones defined in this document or room for future specifications to add additional field=value pairs.
+The SRTP Context syntax utilizes standard attribute key-value pairs to convey data.
+
+The SRTP context can convey one or more key-value pair lists as per the following rules:
+
+{: spacing="compact"}
+- Multiple key-value pairs are separated by semicolons to create a single list.
+- Individual key names MUST be unique within a given list. 
+- Two or more lists of separate key-value pair groupings can be conveyed by wrapping a list in parenthesis and separating them with a comma. 
+- This method of parenthesis grouping MUST NOT be used when there is a single list of key-value pairs (with unique key names.)
+- Multiple of the same key name MAY exist within different key-value list groupings.
+- Further key-value list groupings may contain more or less keys-value pairs than other groupings.
+- A given Key's value does not need to be unique within a given list or across list groupings.
+- The final list member of a given single key-value list or key-value list grouping MUST NOT feature a trailing semicolon or comma.
+
+The first line of {{sampleBase}} details a single list, without parenthesis which conveys two unique key-value pairs.
+The second line of {{sampleBase}} details a list of multiple key-value pair groupings where the key named "key1" exists in two lists, keys name "key2" and "key3" are unique to their list grouping and finally a grouping only contains a single key-value pair named "key4".
+
+The implementation's goal is extendable allowing for additional vendor specific key-value pairs alongside the ones defined in this document or room for future specifications to add additional key-value pairs.
+
+Note that long lines in this document have been broken into multiple lines using the "The Single Backslash Strategy ('\')" defined by {{RFC8792}}.
 
 ~~~
-a=srtpctx:<a-crypto-tag> \
-  <att_field_1>=<value_1>;<att_field_1>=<att_value_2>
+a=srtpctx:1 key1=value1;key2=value2
+a=srtpctx:1 (key1=value1;key2=value2),\
+  (key1=value1;key3=value3),(key4=value4)
 ~~~
 {: #sampleBase title='Base SRTP Context Syntax'}
 
-This specification specifically defines SRTP Context Attribute Fields of SSRC, ROC, and SEQ shown in {{sampleSyntax}}.
+The formal definition of the SRTP Context Attribute, including generic key-value pairs is provided by the following ABNF {{RFC5234}} found in {{genricABNF}}.
+
+~~~~ abnf
+srtp-context    = srtp-attr
+                  srtp-tag
+                  srtp-fmt-param
+                  CRLF
+
+srtp-fmt-param  = srtp-param / srtp-param-list
+
+srtp-param      = 1srtp-ext [*(";" srtp-ext)]
+                  ; One or more key=value pairs
+                  ; key=value pairs separated by semicolon
+                  ; e.g: key=value;key2=value2
+
+srtp-param-list = 1"("srtp-param")" 1*("," "("srtp-param")")
+                  ; Two or more lists of key=value pairs
+                  ; Lists wrapped in parenthesis and separated by commas
+                  ; (key=value;key2=value2), (key=value;key3=value3)
+
+srtp-attr       = "a=srtpctx:"
+
+srtp-tag        = 1*9DIGIT SP
+                  ; Matches tag length ABNF from RFC 4568
+
+srtp-ext        = param-key "=" param-value
+                  ; key=value
+				  
+param-key       = 1*(ALPHA / DIGIT / "_" / "-")
+                  ; Alphanumeric key name
+				  ; May include underscore or hyphen
+
+param-value     = 1*ALPHA
+                  ; Byte String key value
+
+ALPHA           = %x41-5A / %x61-7A 
+                  ; A-Z / a-z
+
+DIGIT           = %x30-39
+                  ; 0-9
+
+BYTESTRING      = %x01-09 / %x0B-0C / %x0E-27 / 
+                  %x2A-2B / %x2D-3A / %x3C-FF
+                  ; Excluding
+                  ; %x00 (NULL)
+                  ; %x0A (LF)
+                  ; %x0D (CR)
+                  ; %x28-29 (Left and Right Parenthesis)
+                  ; %x2C (Comma)
+                  ; %x3B (Semicolon)
+~~~~
+{: #genricABNF title='ABNF of Generic of the SRTP Context Attribute'}
+
+This specification specifically defines SRTP Context Attribute Fields of "ssrc", "roc", and "seq" shown in {{sampleSyntax}}.
 
 ~~~
 a=srtpctx:<a-crypto-tag> \
   ssrc=<ssrc_value_hex>;roc=<roc_value_hex>;seq=<last_known_tx_seq_hex>
 ~~~
 {: #sampleSyntax title='Example SRTP Context Syntax'}
-Note that long lines in this document have been broken into multiple lines using the "The Single Backslash Strategy ('\')" defined by {{RFC8792}}.
 
-The formal definition of the SRTP Context Attribute, including custom extension field=value pairs is provided by the following ABNF {{RFC5234}}:
+The formal definition of the "ssrc", "roc", and "seq" key-value pairs which align to "srtp-ext" of {{genricABNF}} are detailed in this specification are defined by the ABNF of {{definedABNF}}.
 
 ~~~~ abnf
-srtp-context   = srtp-attr
-                 srtp-tag
-                 [srtp-ssrc";"]
-                 [srtp-roc";"]
-                 [srtp-seq";"]
-                 [srtp-ext";"]
-srtp-attr      = "a=srtpctx:"
-srtp-tag       = 1*9DIGIT 1WSP 
-srtp-ssrc      = "ssrc=" ("0x"1*8HEXDIG / "unknown")
-srtp-roc       = "roc=" ("0x"1*4HEXDIG / "unknown")
-srtp-seq       = "seq=" ("0x"1*4HEXDIG / "unknown")
-srtp-ext       = 1*VCHAR "=" (1*VCHAR / "unknown")
-ALPHA          = %x41-5A / %x61-7A   ; A-Z / a-z
-DIGIT          = %x30-39
-HEXDIG         = DIGIT / "A" / "B" / "C" / "D" / "E" / "F"
-VCHAR          = %x21-7E
+srtp-ext  = srtp-ssrc / srtp-roc / srtp-seq
+srtp-ssrc = "ssrc=" ("0x"1*8HEXDIG / "unknown")
+srtp-roc  = "roc=" ("0x"1*4HEXDIG / "unknown")
+srtp-seq  = "seq=" ("0x"1*4HEXDIG / "unknown")
+HEXDIG    = %x30-39 / %x41-46
+            ; 0-9 / A-F
 ~~~~
+{: #definedABNF title='ABNF of Generic of the SRTP Context Attribute'}
 
 Leading 0s may be omitted and the alphanumeric hex may be upper or lowercase but at least one 0 must be present. 
 Additionally the "0x" provided additional context that these values are hex and not integers.
-Thus as per {{sampleCompare}} these two lines are functionally identical:
+Thus as per {{sampleCompare}} these two lines are functionally identical.
 
 ~~~~
 a=srtpctx:1 ssrc=0x00845FED;roc=0x00000000;seq=0x005D
@@ -399,11 +462,13 @@ There is no explicit time or total number of packets in which a new update is re
 This specification will not cause overcrowding on the session establishment protocol's signaling channel if natural session updates, session changes, and session liveliness checks are followed.
 
 ## Extendability {#extendability}
-As stated in {{syntax}}, the SRTP Context SDP implementation's goal is extendability allowing for additional vendor specific field=value pairs alongside the ones defined in this document.
+As stated in {{syntax}}, the SRTP Context SDP implementation's goal is extendability allowing for additional vendor specific key-value pairs alongside the ones defined in this document.
 This ensures that a=crypto SDP security may remain compatible with future algorithms that need to signal cryptographic context information outside of what is currently specified in {{RFC4568}}.
 
+A complying specification needs only to follow the general rules defined by {{syntax}} and the generic ABNF outlined in {{genricABNF}}.
+
 To illustrate, imagine a new example SRTP algorithm and crypto suite is created named "FOO_CHACHA20_POLY1305_SHA256" and the application needs to signal "Foo, "Bar", and "Nonce" values to properly instantiate the SRTP context.
-Rather than modify a=crypto SDP security or create a new unique SDP attribute, one can simply utilize SRTP Context SDP's key=value pairs to convey the information. Implementations MUST define how to handle default scenarios where the value is not present or set to "unknown".
+Rather than modify a=crypto SDP security or create a new unique SDP attribute, one can simply utilize SRTP Context SDP's key-value pairs to convey the information. Implementations MUST define how to handle default scenarios where the value is not present or set to "unknown".
 
 ~~~~
 a=crypto:1 FOO_CHACHA20_POLY1305_SHA256 \
