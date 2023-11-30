@@ -4,7 +4,7 @@ abbrev: "SRTP Assurance"
 category: std
 updates: '4568'
 
-docname: draft-davis-mmusic-srtp-assurance-01
+docname: draft-davis-mmusic-srtp-assurance-02
 submissiontype: IETF
 date: 2023
 consensus: true
@@ -70,6 +70,12 @@ Source for this draft and an issue tracker can be found at https://github.com/ky
 
 ## Changelog {#changelog}
 {:removeinrfc}
+
+draft-02
+
+{: spacing="compact"}
+
+- Better define that the tags must match #16
 
 draft-01
 
@@ -336,9 +342,10 @@ a=srtpctx:2 ssrc=unknown;roc=0x0001
 ~~~~
 {: #sampleUnknown title='Example SRTP Context with unknown mappings'}
 
-The tag for an SRTP Context attribute MUST follow the peer SDP Security a=crypto tag for a given media stream (m=).
-The example in shown in {{sampleTag}} the sender is advertising an explicit packet index mapping for a=crypto tag 2 for the audio stream and tag 1 for the video media stream. 
-Note that some SDP values have been truncated for the sake of simplicity.
+The tag advertised in the SRTP Context attribute is used to identify the SDP Security parameter a given SRTP Context attribute is meant to pair with.
+As such, the tags on the pair of SRTP Context Attribute and SDP Security parameters MUST exactly match within given media stream (m=).
+The example in shown in {{sampleTag}}, within the audio stream, the sender is advertising an explicit packet index mapping for a=crypto tag 2 (a=srtpctx:2) which matches the SDP security parameter with the same tag (a=crypto:2)
+Within the audio and video media stream tag 1 (a=crypto:1) does not feature any paired SRTP Context attributes.
 
 ~~~~
 c=IN IP4 192.0.0.1
