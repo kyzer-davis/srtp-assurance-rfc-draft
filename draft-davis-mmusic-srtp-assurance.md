@@ -313,10 +313,10 @@ srtp-tag        = 1*9DIGIT SP
 
 srtp-ext        = param-key "=" param-value
                   ; key=value
-				  
+
 param-key       = 1*(ALPHA / DIGIT / "_" / "-")
                   ; Alphanumeric key name
-				  ; May include underscore or hyphen
+                  ; May include underscore or hyphen
 
 param-value     = 1*ALPHA
                   ; Byte String key value
