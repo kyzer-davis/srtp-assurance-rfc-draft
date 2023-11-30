@@ -32,6 +32,7 @@ normative:
 informative:
   RFC3550: RFC3550
   RFC3830: RFC3830
+  RFC3986: RFC3986
   RFC4567: RFC4567
   RFC4771: RFC4771
   RFC5159: RFC5159
@@ -338,6 +339,9 @@ BYTESTRING      = %x01-09 / %x0B-0C / %x0E-27 /
                   ; %x3B (Semicolon)
 ~~~~
 {: #genricABNF title='ABNF of Generic of the SRTP Context Attribute'}
+
+Note that {genricABNF} does not allow raw left or right parenthesis, comma or semicolons within a parameter value as to avoid paring errors with those specific delimeters.
+If these specific values need to be conveyed, the value MAY be "percent encoded" as described by the logic in {{RFC3986}}, Section 2.1.
 
 This specification specifically defines SRTP Context Attribute Fields of "ssrc", "roc", and "seq" shown in {{sampleSyntax}}.
 
