@@ -5,14 +5,14 @@
 # Latest
 ```
 Name:     draft-davis-mmusic-srtp-assurance
-Revision: 02
+Revision: 03
 Title:    Signaling Additional SRTP Context information via SDP
-Date:     2023-12-06
+Date:     2024-01-10
 Group:    Individual Submission
 Pages:    24
-URL:      https://www.ietf.org/archive/id/draft-davis-mmusic-srtp-assurance-02.txt
+URL:      https://www.ietf.org/archive/id/draft-davis-mmusic-srtp-assurance-03.txt
 Status:   https://datatracker.ietf.org/doc/draft-davis-mmusic-srtp-assurance/
-HTML:     https://www.ietf.org/archive/id/draft-davis-mmusic-srtp-assurance-02.html
+HTML:     https://www.ietf.org/archive/id/draft-davis-mmusic-srtp-assurance-03.html
 HTMLized: https://datatracker.ietf.org/doc/html/draft-davis-mmusic-srtp-assurance
-Diff:     https://author-tools.ietf.org/iddiff?url2=draft-davis-mmusic-srtp-assurance-02
+Diff:     https://author-tools.ietf.org/iddiff?url2=draft-davis-mmusic-srtp-assurance-03
 ```
