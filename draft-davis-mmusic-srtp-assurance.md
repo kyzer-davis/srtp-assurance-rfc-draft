@@ -467,7 +467,7 @@ See {{frequency}} for update frequency recommendations.
 ### Receiver Behavior {#receiver}
 Receivers SHOULD utilize the signaled information in application logic to instantiate the SRTP cryptographic context.
 
-In the even there is no SRTP Context Attributes present in SDP receivers SHOULD fall back to application defaults as outlined in {{unknowns}}.
+In the event there is no SRTP Context Attributes present in SDP receivers SHOULD fall back to application defaults as outlined in {{unknowns}}.
 
 See {{unknowns}} for handling scenarios where a value was advertised and has been removed during session modification.
 
