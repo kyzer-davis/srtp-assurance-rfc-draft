@@ -1,5 +1,5 @@
 ---
-title: "Signaling Additional SRTP Context information via SDP"
+title: "Signaling Additional SRTP Context Information Via SDP"
 abbrev: "SRTP Assurance"
 category: std
 updates: '4568'
