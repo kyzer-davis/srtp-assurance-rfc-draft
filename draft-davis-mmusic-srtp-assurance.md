@@ -6,7 +6,7 @@ updates: '4568'
 
 docname: draft-davis-mmusic-srtp-assurance-03
 submissiontype: IETF
-date: 2023
+date: 2024
 consensus: true
 v: 3
 area: ART
