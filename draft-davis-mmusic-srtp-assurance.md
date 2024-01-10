@@ -4,7 +4,7 @@ abbrev: "SRTP Assurance"
 category: std
 updates: '4568'
 
-docname: draft-davis-mmusic-srtp-assurance-02
+docname: draft-davis-mmusic-srtp-assurance-03
 submissiontype: IETF
 date: 2023
 consensus: true
@@ -71,6 +71,12 @@ Source for this draft and an issue tracker can be found at https://github.com/ky
 
 ## Changelog {#changelog}
 {:removeinrfc}
+
+draft-03
+
+{: spacing="compact"}
+
+- Consolidate references to late binding, fix nits #20
 
 draft-02
 
